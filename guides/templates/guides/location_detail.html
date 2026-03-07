@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 <article class="detail-card">
-  <h2>{{ location.title }}</h2>
+  <h2>{{ location.title }} {% if location.is_featured %}<span class="badge-featured">Фича</span>{% endif %}</h2>
   <p class="muted">{{ location.city }}</p>
 
   <form method="post" action="{% url 'toggle_favorite' location.pk %}" style="margin-bottom: 10px;">

@@ -99,3 +99,5 @@ a { color: inherit; text-decoration: none; }
 
 .btn-danger { background:#be123c; }
 .row-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+.badge-featured { display:inline-block; margin-left:8px; padding:2px 8px; font-size:12px; border-radius:999px; background:#f59e0b; color:#111827; vertical-align:middle; }

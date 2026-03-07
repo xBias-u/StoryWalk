@@ -15,7 +15,7 @@
   {% for location in locations %}
     <article class="card">
       {% if location.image %}<img src="{{ location.image.url }}" alt="{{ location.title }}">{% endif %}
-      <h3>{{ location.title }}</h3>
+      <h3>{{ location.title }} {% if location.is_featured %}<span class="badge-featured">Фича</span>{% endif %}</h3>
       <p class="muted">{{ location.city }}</p>
       <p>{{ location.short_description }}</p>
       <div class="row-actions">

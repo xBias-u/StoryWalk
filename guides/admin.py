@@ -10,8 +10,9 @@ class AudioGuideInline(admin.StackedInline):
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ('title', 'city', 'created_at')
+    list_display = ('title', 'city', 'is_featured', 'created_at')
     search_fields = ('title', 'city')
+    list_filter = ('is_featured', 'city')
     inlines = [AudioGuideInline]
 
 

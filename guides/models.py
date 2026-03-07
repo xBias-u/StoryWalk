@@ -6,12 +6,13 @@ class Location(models.Model):
     title = models.CharField(max_length=200)
     city = models.CharField(max_length=120, blank=True)
     short_description = models.CharField(max_length=255)
+    is_featured = models.BooleanField(default=False)
     full_description = models.TextField()
     image = models.ImageField(upload_to='locations/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['title']
+        ordering = ['-is_featured', 'title']
 
     def __str__(self):
         return self.title
