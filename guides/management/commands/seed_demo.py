@@ -36,15 +36,20 @@ class Command(BaseCommand):
         for row in locations:
             Location.objects.update_or_create(title=row['title'], defaults=row)
 
+        # Keep demo pricing clean and deterministic
+        SubscriptionPlan.objects.filter(is_demo=True).delete()
+
         plans = [
             ('Базовый', 0, 'Бесплатный доступ к базовым аудиогидам и ознакомительным маршрутам.'),
             ('Путешественник+', 399, 'Расширенная библиотека аудиогидов и новые маршруты.'),
             ('StoryWalk Premium', 799, 'Полный доступ к расширенным гидам и ранним релизам.'),
         ]
         for name, price, desc in plans:
-            SubscriptionPlan.objects.update_or_create(
+            SubscriptionPlan.objects.create(
                 name=name,
-                defaults={'price_rub': price, 'description': desc, 'is_demo': True},
+                price_rub=price,
+                description=desc,
+                is_demo=True,
             )
 
         self.stdout.write(self.style.SUCCESS('Demo data seeded.'))
