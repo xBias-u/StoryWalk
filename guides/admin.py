@@ -10,16 +10,20 @@ class AudioGuideInline(admin.StackedInline):
 
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ('title', 'city', 'is_featured', 'created_at')
+    list_display = ('title', 'city', 'is_featured', 'segment', 'access_level', 'created_at')
     search_fields = ('title', 'city')
-    list_filter = ('is_featured', 'city')
+    list_filter = ('is_featured', 'city', 'segment', 'access_level')
     inlines = [AudioGuideInline]
+    fieldsets = (
+        ('Основное', {'fields': ('title', 'city', 'short_description', 'full_description', 'image')}),
+        ('Lean Canvas метки', {'fields': ('is_featured', 'segment', 'access_level')}),
+    )
 
 
 @admin.register(AudioGuide)
 class AudioGuideAdmin(admin.ModelAdmin):
-    list_display = ('location', 'language', 'voice_name', 'created_at')
-    list_filter = ('language',)
+    list_display = ('location', 'language', 'voice_name', 'acquisition_channel', 'created_at')
+    list_filter = ('language', 'acquisition_channel')
     search_fields = ('location__title',)
 
 

@@ -18,6 +18,7 @@
       <h3>{{ location.title }} {% if location.is_featured %}<span class="badge-featured">Фича</span>{% endif %}</h3>
       <p class="muted">{{ location.city }}</p>
       <p>{{ location.short_description }}</p>
+      <p class="muted">{{ location.get_access_level_display }} · {{ location.get_segment_display }}</p>
       <div class="row-actions">
         <a class="btn btn-secondary" href="{% url 'location_detail' location.pk %}">Открыть</a>
         <form method="post" action="{% url 'toggle_favorite' location.pk %}">
