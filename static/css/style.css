@@ -127,3 +127,28 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; }
 }
+
+
+/* subtle polish */
+.hero h1 { line-height: 1.1; letter-spacing: -0.02em; }
+.hero p { color: #cbd5e1; }
+.card h3 { margin-top: 0; }
+.card, .detail-card, .hero-panel {
+  transition: transform .18s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.card:hover, .hero-panel:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+  box-shadow: 0 10px 28px rgba(30, 64, 175, 0.22);
+}
+.btn {
+  transition: transform .12s ease, filter .2s ease, box-shadow .2s ease;
+  box-shadow: 0 6px 18px rgba(37,99,235,.25);
+}
+.btn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.hero-badge {
+  background: rgba(30,64,175,.12);
+  backdrop-filter: blur(4px);
+}
+ul li { margin-bottom: 6px; }
