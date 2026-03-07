@@ -70,6 +70,25 @@ class AudioGuide(models.Model):
         return f"{self.location.title} ({self.language})"
 
 
+class AudioListenEvent(models.Model):
+    EVENT_CHOICES = [
+        ('start', 'Старт прослушивания'),
+        ('progress', 'Прогресс прослушивания'),
+        ('complete', 'Завершение прослушивания'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='listen_events')
+    event_type = models.CharField(max_length=12, choices=EVENT_CHOICES)
+    current_seconds = models.FloatField(default=0)
+    duration_seconds = models.FloatField(default=0)
+    completion_percent = models.FloatField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+
 class SubscriptionPlan(models.Model):
     name = models.CharField('Название тарифа', max_length=120)
     price_rub = models.PositiveIntegerField('Цена в месяц (₽)', default=0)

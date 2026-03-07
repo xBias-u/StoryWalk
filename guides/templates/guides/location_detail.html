@@ -19,7 +19,7 @@
   {% if location.audio_guide %}
     <h3>Аудиогид</h3>
 
-    <div class="player" data-player>
+    <div class="player" data-player data-location-id="{{ location.id }}">
       <audio data-audio preload="none">
         <source src="{{ location.audio_guide.audio_file.url }}" type="audio/mpeg">
       </audio>

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Location, AudioGuide, SubscriptionPlan, UserProfile, FavoriteLocation
+from .models import Location, AudioGuide, SubscriptionPlan, UserProfile, FavoriteLocation, AudioListenEvent
 
 
 class AudioGuideInline(admin.StackedInline):
@@ -25,6 +25,13 @@ class AudioGuideAdmin(admin.ModelAdmin):
     list_display = ('location', 'language', 'voice_name', 'acquisition_channel', 'created_at')
     list_filter = ('language', 'acquisition_channel')
     search_fields = ('location__title',)
+
+
+@admin.register(AudioListenEvent)
+class AudioListenEventAdmin(admin.ModelAdmin):
+    list_display = ('created_at', 'event_type', 'location', 'user', 'completion_percent')
+    list_filter = ('event_type', 'location')
+    search_fields = ('location__title', 'user__username')
 
 
 @admin.register(SubscriptionPlan)

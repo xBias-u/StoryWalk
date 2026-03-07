@@ -7,6 +7,8 @@ from .views import (
     SignUpView,
     ToggleFavoriteView,
     ProfileView,
+    MetricsView,
+    AudioEventApiView,
 )
 
 urlpatterns = [
@@ -17,4 +19,6 @@ urlpatterns = [
     path('subscription-demo/', SubscriptionDemoView.as_view(), name='subscription_demo'),
     path('accounts/signup/', SignUpView.as_view(), name='signup'),
     path('profile/', ProfileView.as_view(), name='profile'),
+    path('metrics/', MetricsView.as_view(), name='metrics'),
+    path('api/audio-events/', AudioEventApiView.as_view(), name='audio_event_api'),
 ]

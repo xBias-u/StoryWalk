@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Метрики MVP</h2>
+<p class="muted">Lean Canvas: частота прослушиваний, глубина и завершённость.</p>
+
+<div class="grid">
+  <article class="card"><h3>Старты прослушивания</h3><p><strong>{{ total_starts }}</strong></p></article>
+  <article class="card"><h3>Завершения</h3><p><strong>{{ total_completes }}</strong></p></article>
+  <article class="card"><h3>Completion Rate</h3><p><strong>{{ completion_rate }}%</strong></p></article>
+  <article class="card"><h3>Средняя глубина</h3><p><strong>{{ avg_completion }}%</strong></p></article>
+</div>
+
+<article class="detail-card" style="margin-top:18px;">
+  <h3>По локациям</h3>
+  <div style="overflow:auto;">
+    <table style="width:100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="text-align:left; padding:8px; border-bottom:1px solid #334155;">Локация</th>
+          <th style="text-align:right; padding:8px; border-bottom:1px solid #334155;">Старты</th>
+          <th style="text-align:right; padding:8px; border-bottom:1px solid #334155;">Завершения</th>
+          <th style="text-align:right; padding:8px; border-bottom:1px solid #334155;">Ср. глубина</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for loc in per_location %}
+          <tr>
+            <td style="padding:8px; border-bottom:1px solid #1e293b;">{{ loc.title }}</td>
+            <td style="padding:8px; border-bottom:1px solid #1e293b; text-align:right;">{{ loc.starts|default:0 }}</td>
+            <td style="padding:8px; border-bottom:1px solid #1e293b; text-align:right;">{{ loc.completes|default:0 }}</td>
+            <td style="padding:8px; border-bottom:1px solid #1e293b; text-align:right;">{{ loc.avg_completion|default:0|floatformat:1 }}%</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="muted" style="padding:8px;">Пока нет данных по прослушиваниям.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</article>
+{% endblock %}
