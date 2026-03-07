@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Профиль</h2>
+<form method="post" enctype="multipart/form-data" class="auth-form">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button class="btn" type="submit">Сохранить</button>
+</form>
+
+{% if request.user.profile.avatar %}
+  <div style="margin-top: 16px;">
+    <img src="{{ request.user.profile.avatar.url }}" alt="avatar" style="max-width: 140px; border-radius: 12px; border:1px solid #334155;">
+  </div>
+{% endif %}
+
+<h3 style="margin-top: 24px;">Избранные места</h3>
+<div class="grid">
+  {% for location in favorites %}
+    <article class="card">
+      <h4>{{ location.title }}</h4>
+      <p class="muted">{{ location.city }}</p>
+      <a class="btn btn-secondary" href="{% url 'location_detail' location.pk %}">Открыть</a>
+    </article>
+  {% empty %}
+    <p class="muted">Пока пусто — добавь что-нибудь в избранное.</p>
+  {% endfor %}
+</div>
+{% endblock %}

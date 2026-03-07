@@ -4,6 +4,14 @@
 <article class="detail-card">
   <h2>{{ location.title }}</h2>
   <p class="muted">{{ location.city }}</p>
+
+  <form method="post" action="{% url 'toggle_favorite' location.pk %}" style="margin-bottom: 10px;">
+    {% csrf_token %}
+    <button class="btn {% if is_favorite %}btn-danger{% else %}btn-secondary{% endif %}" type="submit">
+      {% if is_favorite %}♥ Убрать из избранного{% else %}♡ Добавить в избранное{% endif %}
+    </button>
+  </form>
+
   {% if location.image %}<img class="detail-image" src="{{ location.image.url }}" alt="{{ location.title }}">{% endif %}
   <p>{{ location.full_description }}</p>
 

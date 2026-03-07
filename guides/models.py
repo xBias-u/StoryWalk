@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -37,3 +38,25 @@ class SubscriptionPlan(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+    bio = models.CharField(max_length=240, blank=True)
+
+    def __str__(self):
+        return f"Profile: {self.user.username}"
+
+
+class FavoriteLocation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='favorite_locations')
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='liked_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'location')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} ♥ {self.location.title}"

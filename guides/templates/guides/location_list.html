@@ -18,7 +18,15 @@
       <h3>{{ location.title }}</h3>
       <p class="muted">{{ location.city }}</p>
       <p>{{ location.short_description }}</p>
-      <a class="btn btn-secondary" href="{% url 'location_detail' location.pk %}">Открыть</a>
+      <div class="row-actions">
+        <a class="btn btn-secondary" href="{% url 'location_detail' location.pk %}">Открыть</a>
+        <form method="post" action="{% url 'toggle_favorite' location.pk %}">
+          {% csrf_token %}
+          <button class="btn {% if location.id in favorite_ids %}btn-danger{% else %}btn-secondary{% endif %}" type="submit">
+            {% if location.id in favorite_ids %}♥ В избранном{% else %}♡ В избранное{% endif %}
+          </button>
+        </form>
+      </div>
     </article>
   {% empty %}
     <p>Ничего не найдено. Попробуй изменить фильтры.</p>
