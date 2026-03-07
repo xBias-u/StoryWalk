@@ -12,7 +12,7 @@
     <a class="brand" href="/">StoryWalk</a>
     <nav>
       <a href="/guides/">Гиды</a>
-      <a href="/subscription-demo/">Подписка</a>
+      <a href="/subscription-demo/">Тарифы (демо)</a>
       {% if user.is_authenticated %}
         <a href="{% url 'profile' %}">Профиль</a>
         <span class="muted">{{ user.username }}</span>
