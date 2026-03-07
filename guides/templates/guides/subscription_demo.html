@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Демонстрация подписки</h2>
+<p class="muted">В MVP это ознакомительный блок будущего функционала.</p>
+<div class="grid">
+  {% for plan in plans %}
+    <article class="card">
+      <h3>{{ plan.name }}</h3>
+      <p><strong>{{ plan.price_rub }} ₽ / мес</strong></p>
+      <p>{{ plan.description }}</p>
+      <button class="btn" disabled>Скоро</button>
+    </article>
+  {% empty %}
+    <p>Добавь тарифы через админку, чтобы показать этот раздел.</p>
+  {% endfor %}
+</div>
+{% endblock %}
