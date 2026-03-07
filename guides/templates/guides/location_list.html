@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Достопримечательности</h2>
+<div class="section-title">
+  <h2>Достопримечательности</h2>
+</div>
+
+<form class="filter-row" method="get">
+  <input type="text" name="q" placeholder="Поиск по названию" value="{{ q }}">
+  <input type="text" name="city" placeholder="Город" value="{{ city }}">
+  <button class="btn" type="submit">Найти</button>
+  <a class="btn btn-secondary" href="{% url 'location_list' %}">Сбросить</a>
+</form>
+
 <div class="grid">
   {% for location in locations %}
     <article class="card">
@@ -11,7 +21,7 @@
       <a class="btn btn-secondary" href="{% url 'location_detail' location.pk %}">Открыть</a>
     </article>
   {% empty %}
-    <p>Пока нет локаций. Добавь через админку.</p>
+    <p>Ничего не найдено. Попробуй изменить фильтры.</p>
   {% endfor %}
 </div>
 {% endblock %}
