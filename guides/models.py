@@ -91,6 +91,20 @@ class AudioListenEvent(models.Model):
         ordering = ['-created_at']
 
 
+class LocationImage(models.Model):
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='gallery_images')
+    image = models.ImageField('Изображение', upload_to='locations/gallery/')
+    caption = models.CharField('Подпись', max_length=140, blank=True)
+    sort_order = models.PositiveIntegerField('Порядок', default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['sort_order', 'id']
+
+    def __str__(self):
+        return f"{self.location.title} #{self.id}"
+
+
 class SubscriptionPlan(models.Model):
     name = models.CharField('Название тарифа', max_length=120)
     price_rub = models.PositiveIntegerField('Цена в месяц (₽)', default=0)

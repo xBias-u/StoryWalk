@@ -67,6 +67,18 @@ mkdir -p media/location_images
 python manage.py import_location_images --dir media/location_images
 ```
 
+## Bulk-галерея (несколько фото на локацию)
+Если для одной локации много фото, используй префиксы в именах файлов:
+- `kreml1.png`, `kreml2.png`, ...
+- `kungur1.png`, `kungur2.png`, ...
+- `isaakievskiy_sobor1.png`, ...
+
+Импорт:
+```bash
+python manage.py import_location_gallery --dir media/location_images --clear
+```
+`--clear` удаляет старую галерею для затронутых локаций перед импортом.
+
 ## Прод-готовность (Render/Railway)
 Проект уже подготовлен для деплоя:
 - `gunicorn`

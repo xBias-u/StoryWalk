@@ -1,10 +1,15 @@
 from django.contrib import admin
 
-from .models import Location, AudioGuide, SubscriptionPlan, UserProfile, FavoriteLocation, AudioListenEvent
+from .models import Location, AudioGuide, SubscriptionPlan, UserProfile, FavoriteLocation, AudioListenEvent, LocationImage
 
 
 class AudioGuideInline(admin.StackedInline):
     model = AudioGuide
+    extra = 0
+
+
+class LocationImageInline(admin.TabularInline):
+    model = LocationImage
     extra = 0
 
 
@@ -13,7 +18,7 @@ class LocationAdmin(admin.ModelAdmin):
     list_display = ('title', 'city', 'is_featured', 'segment', 'access_level', 'created_at')
     search_fields = ('title', 'city')
     list_filter = ('is_featured', 'city', 'segment', 'access_level')
-    inlines = [AudioGuideInline]
+    inlines = [AudioGuideInline, LocationImageInline]
     fieldsets = (
         ('Основное', {'fields': ('title', 'city', 'short_description', 'full_description', 'image')}),
         ('Lean Canvas метки', {'fields': ('is_featured', 'segment', 'access_level')}),
