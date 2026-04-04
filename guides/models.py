@@ -55,6 +55,8 @@ class AudioGuide(models.Model):
     language = models.CharField('Язык', max_length=16, default='ru')
     voice_name = models.CharField('Голос ИИ', max_length=80, blank=True)
     audio_file = models.FileField('Аудиофайл (mp3)', upload_to='audio_guides/')
+    audio_short_file = models.FileField('Короткая версия (mp3)', upload_to='audio_guides/', blank=True, null=True)
+    audio_long_file = models.FileField('Длинная версия (mp3)', upload_to='audio_guides/', blank=True, null=True)
     duration_seconds = models.PositiveIntegerField('Длительность (сек.)', default=0)
     source_url = models.URLField('Источник текста', blank=True)
     acquisition_channel = models.CharField(

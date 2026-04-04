@@ -19,25 +19,69 @@
   {% if location.audio_guide %}
     <h3>Аудиогид</h3>
 
-    <div class="player" data-player data-location-id="{{ location.id }}">
-      <audio data-audio preload="none">
-        <source src="{{ location.audio_guide.audio_file.url }}" type="audio/mpeg">
-      </audio>
-
-      <div class="player-row">
-        <button class="btn" type="button" data-play>▶ Play</button>
-        <label class="muted">Скорость
-          <select data-rate>
-            <option value="1">1x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-          </select>
-        </label>
+    {% if location.audio_guide.audio_short_file %}
+      <p class="muted" style="margin-bottom:6px;">Короткая версия</p>
+      <div class="player" data-player data-location-id="{{ location.id }}">
+        <audio data-audio preload="none">
+          <source src="{{ location.audio_guide.audio_short_file.url }}" type="audio/mpeg">
+        </audio>
+        <div class="player-row">
+          <button class="btn" type="button" data-play>▶ Play</button>
+          <label class="muted">Скорость
+            <select data-rate>
+              <option value="1">1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+            </select>
+          </label>
+        </div>
+        <input type="range" min="0" max="100" value="0" data-progress>
+        <div class="player-meta muted"><span data-time>00:00</span> / <span data-duration>00:00</span></div>
       </div>
+    {% endif %}
 
-      <input type="range" min="0" max="100" value="0" data-progress>
-      <div class="player-meta muted"><span data-time>00:00</span> / <span data-duration>00:00</span></div>
-    </div>
+    {% if location.audio_guide.audio_long_file %}
+      <p class="muted" style="margin:12px 0 6px;">Длинная версия</p>
+      <div class="player" data-player data-location-id="{{ location.id }}">
+        <audio data-audio preload="none">
+          <source src="{{ location.audio_guide.audio_long_file.url }}" type="audio/mpeg">
+        </audio>
+        <div class="player-row">
+          <button class="btn" type="button" data-play>▶ Play</button>
+          <label class="muted">Скорость
+            <select data-rate>
+              <option value="1">1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+            </select>
+          </label>
+        </div>
+        <input type="range" min="0" max="100" value="0" data-progress>
+        <div class="player-meta muted"><span data-time>00:00</span> / <span data-duration>00:00</span></div>
+      </div>
+    {% endif %}
+
+    {% if not location.audio_guide.audio_short_file and not location.audio_guide.audio_long_file %}
+      <div class="player" data-player data-location-id="{{ location.id }}">
+        <audio data-audio preload="none">
+          <source src="{{ location.audio_guide.audio_file.url }}" type="audio/mpeg">
+        </audio>
+
+        <div class="player-row">
+          <button class="btn" type="button" data-play>▶ Play</button>
+          <label class="muted">Скорость
+            <select data-rate>
+              <option value="1">1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+            </select>
+          </label>
+        </div>
+
+        <input type="range" min="0" max="100" value="0" data-progress>
+        <div class="player-meta muted"><span data-time>00:00</span> / <span data-duration>00:00</span></div>
+      </div>
+    {% endif %}
 
     <p class="muted">Язык: {{ location.audio_guide.language }}{% if location.audio_guide.voice_name %}, голос: {{ location.audio_guide.voice_name }}{% endif %}</p>
   {% else %}

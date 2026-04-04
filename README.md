@@ -37,7 +37,10 @@ python manage.py import_drive_places
 1. Открой админку `/admin/`
 2. Создай/открой `AudioGuide`
 3. Выбери нужную `Location`
-4. Загрузить mp3 в поле `audio_file`
+4. Загрузи mp3 в поля:
+   - `audio_short_file` — короткая версия
+   - `audio_long_file` — длинная версия
+   - `audio_file` — fallback (обратная совместимость)
 5. Заполни `duration_seconds`, `voice_name` (опционально)
 
 После сохранения аудио автоматически появится на странице локации (`/guides/<id>/`).
