@@ -50,6 +50,23 @@ CLI-вариант (без админки):
 python manage.py set_location_audio --title "Кремль" --short /path/to/kreml_short.mp3 --long /path/to/kreml_long.mp3 --voice "Florian"
 ```
 
+## Bulk-загрузка картинок локаций
+1. Создай папку, например:
+```bash
+mkdir -p media/location_images
+```
+2. Положи туда файлы с именами-алиасами:
+- `isaakievskiy_sobor.jpg`
+- `istoricheskiy_muzey.jpg`
+- `kreml.jpg`
+- `kungur.jpg`
+- `ermitazh.jpg`
+
+3. Запусти импорт:
+```bash
+python manage.py import_location_images --dir media/location_images
+```
+
 ## Прод-готовность (Render/Railway)
 Проект уже подготовлен для деплоя:
 - `gunicorn`
