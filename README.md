@@ -45,6 +45,11 @@ python manage.py import_drive_places
 
 После сохранения аудио автоматически появится на странице локации (`/guides/<id>/`).
 
+CLI-вариант (без админки):
+```bash
+python manage.py set_location_audio --title "Кремль" --short /path/to/kreml_short.mp3 --long /path/to/kreml_long.mp3 --voice "Florian"
+```
+
 ## Прод-готовность (Render/Railway)
 Проект уже подготовлен для деплоя:
 - `gunicorn`

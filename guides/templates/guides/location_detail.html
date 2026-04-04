@@ -13,7 +13,7 @@
   </form>
 
   {% if location.image %}<img class="detail-image" src="{{ location.image.url }}" alt="{{ location.title }}">{% endif %}
-  <p>{{ location.full_description }}</p>
+  <p>{{ location.full_description|linebreaksbr }}</p>
   <p class="muted">Уровень доступа: {{ location.get_access_level_display }} · Сегмент: {{ location.get_segment_display }}</p>
 
   {% if location.audio_guide %}
