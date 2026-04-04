@@ -154,12 +154,12 @@ a { color: inherit; text-decoration: none; }
 ul li { margin-bottom: 6px; }
 
 .guide-text {
-  max-width: 76ch;
-  line-height: 1.8;
-  font-size: 1.02rem;
+  max-width: 74ch;
+  line-height: 1.9;
+  font-size: 1.08rem;
 }
 .guide-text p {
-  margin: 0 0 1em;
-  color: #dbe7f3;
+  margin: 0 0 1.15em;
+  color: #e3edf8;
 }
 

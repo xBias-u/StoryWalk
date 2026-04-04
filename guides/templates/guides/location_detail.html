@@ -108,7 +108,7 @@
   <section id="text">
     <details open>
       <summary class="muted" style="cursor:pointer;margin-bottom:8px;">Описание локации</summary>
-      <div class="guide-text">{{ location.full_description|clean_guide_text|linebreaks }}</div>
+      <div class="guide-text">{{ location.full_description|clean_guide_text|format_guide_text|linebreaks }}</div>
     </details>
   </section>
 
