@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 from guides.models import Location, LocationImage
 
 ALIASES = {
-    'kreml': 'Кремль',
+    'kreml': 'Красная площадь',
     'isaakievskiy_sobor': 'Исаакиевский собор',
     'istoricheskiy_muzey': 'Исторический музей',
     'kungur': 'Кунгур',

@@ -10,7 +10,7 @@ from guides.models import Location
 DEFAULT_MAP = {
     'isaakievskiy_sobor': 'Исаакиевский собор',
     'istoricheskiy_muzey': 'Исторический музей',
-    'kreml': 'Кремль',
+    'kreml': 'Красная площадь',
     'kungur': 'Кунгур',
     'ermitazh': 'Эритаж',
 }
