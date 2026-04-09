@@ -24,14 +24,6 @@ class Command(BaseCommand):
                 'segment': 'solo',
                 'access_level': 'paid',
             },
-            {
-                'title': 'ВДНХ',
-                'city': 'Москва',
-                'short_description': 'Выставочный комплекс с архитектурой и музеями.',
-                'full_description': 'ВДНХ — крупный культурно-выставочный комплекс с павильонами, музеями и прогулочными зонами.',
-                'segment': 'family',
-                'access_level': 'free',
-            },
         ]
         for row in locations:
             Location.objects.update_or_create(title=row['title'], defaults=row)
