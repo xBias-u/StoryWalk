@@ -79,6 +79,11 @@ python manage.py import_location_gallery --dir media/location_images --clear
 ```
 `--clear` удаляет старую галерею для затронутых локаций перед импортом.
 
+## Поставить обложку из самого тяжёлого файла
+```bash
+python manage.py set_cover_largest --title "Исаакиевский собор" --dir media/location_images --prefix isaakievskiy_sobor --prefix isaak
+```
+
 ## Прод-готовность (Render/Railway)
 Проект уже подготовлен для деплоя:
 - `gunicorn`
