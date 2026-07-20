@@ -1,52 +1,144 @@
 {% extends 'base.html' %}
 {% block content %}
-<section class="hero hero-pro">
-  <div class="hero-grid">
-    <div>
-      <h1>AI-аудиогиды по малым городам России</h1>
-      <p>StoryWalk — сервис коротких аудиоэкскурсий по достопримечательностям: текст, фото и озвучка в одном интерфейсе.</p>
-      <div class="actions">
-        {% if user.is_authenticated %}
-          <a class="btn" href="/guides/">Открыть аудиогиды</a>
-        {% else %}
-          <a class="btn" href="{% url 'signup' %}">Начать бесплатно</a>
-          <a class="btn btn-secondary" href="{% url 'login' %}">Войти</a>
-        {% endif %}
-      </div>
+<section class="hero section-shell">
+  <div class="hero-copy">
+    <p class="eyebrow">Персональные аудиопрогулки</p>
+    <h1>У города есть голос.<br>Просто начните идти.</h1>
+    <p class="hero-lead">Выберите, где вы, сколько у вас времени и что вам интересно. StoryWalk соберёт прогулку и расскажет истории по пути — телефон можно убрать в карман.</p>
+
+    <div class="signature-line" aria-hidden="true">
+      <svg viewBox="0 0 720 96" preserveAspectRatio="none">
+        <path class="signature-track" d="M2 49h30l8-25 14 50 15-69 16 82 15-62 15 39 16-22 14 10h54c30 0 37-24 65-24 33 0 36 42 71 42 29 0 35-31 66-31h50c26 0 31 26 58 26 25 0 33-19 55-19h32c20 0 27-16 50-16 30 0 35 30 70 30h28"/>
+        <circle cx="680" cy="60" r="5"/>
+      </svg>
     </div>
-    <div class="hero-panel">
-      <h3>✨ У нас ты найдешь</h3>
-      <ul>
-        <li>🧭 Каталог локаций с фильтрами</li>
-        <li>🎧 Аудиоплеер + метрики прослушивания</li>
-        <li>💳 Фримиум-модель тарифов (демо)</li>
-      </ul>
+
+    <div class="hero-proof" aria-label="Преимущества">
+      <span>Без группы</span>
+      <span>В вашем темпе</span>
+      <span>Истории по пути</span>
     </div>
   </div>
+
+  <form class="walk-planner" action="{% url 'location_list' %}" method="get">
+    <div class="planner-heading">
+      <span class="planner-step">Ваша прогулка</span>
+      <span class="planner-time">≈ 30 секунд</span>
+    </div>
+
+    <label class="planner-field">
+      <span class="field-number">01</span>
+      <span class="field-copy">
+        <span class="field-label">Где вы?</span>
+        <input type="text" name="city" value="Москва" aria-label="Город">
+      </span>
+    </label>
+
+    <label class="planner-field">
+      <span class="field-number">02</span>
+      <span class="field-copy">
+        <span class="field-label">Сколько времени?</span>
+        <select name="duration" aria-label="Продолжительность прогулки">
+          <option value="30">30 минут</option>
+          <option value="60" selected>60 минут</option>
+          <option value="90">90 минут</option>
+          <option value="120">2 часа</option>
+        </select>
+      </span>
+    </label>
+
+    <label class="planner-field">
+      <span class="field-number">03</span>
+      <span class="field-copy">
+        <span class="field-label">Что вам интересно?</span>
+        <select name="interest" aria-label="Интерес">
+          <option value="architecture">Архитектура</option>
+          <option value="history">История</option>
+          <option value="art">Искусство</option>
+          <option value="local">Городские истории</option>
+        </select>
+      </span>
+    </label>
+
+    <button class="btn btn-primary btn-large btn-full" type="submit">
+      Собрать прогулку
+      <span aria-hidden="true">→</span>
+    </button>
+    <p class="planner-note">Регистрация не нужна</p>
+  </form>
 </section>
 
-<section class="grid" style="margin-top: 20px;">
-  <article class="card soft">
-    <h3>🧑‍🤝‍🧑 Целевая аудитория</h3>
-    <p>Самостоятельные путешественники, пары, семьи с детьми и соло-туристы.</p>
-  </article>
-  <article class="card soft">
-    <h3>💡 Ценность продукта</h3>
-    <p>Быстрое знакомство с городом без гида: открыл карточку и слушаешь маршрут в удобном темпе.</p>
-  </article>
-  <article class="card soft">
-    <h3>📈 Фримиум-модель</h3>
-    <p>Базовые гиды доступны бесплатно, расширенные аудиогиды — в рамках подписки (демо-режим).</p>
-  </article>
+<section class="manifesto section-shell">
+  <p class="eyebrow">Город — главный герой</p>
+  <blockquote>Не ещё один список фактов.<br>Прогулка, которую хочется запомнить.</blockquote>
+  <p>Мы соединяем маршрут и короткие аудиоистории так, чтобы вы меньше смотрели в экран и больше замечали вокруг.</p>
 </section>
 
-<section class="detail-card" style="margin-top: 20px;">
-  <h3>📊 Метрики продукта</h3>
-  <ul>
-    <li>Частота и время прослушиваний</li>
-    <li>Глубина прослушивания аудиогида</li>
-    <li>Повторные визиты пользователей</li>
-    <li>Уровень удовлетворённости (CSI)</li>
-  </ul>
+{% if featured_locations %}
+<section class="featured section-shell" aria-labelledby="featured-title">
+  <div class="section-heading-row">
+    <div>
+      <p class="eyebrow">Можно послушать сейчас</p>
+      <h2 id="featured-title">Истории рядом</h2>
+    </div>
+    <a class="arrow-link" href="{% url 'location_list' %}">Все прогулки <span aria-hidden="true">→</span></a>
+  </div>
+
+  <div class="story-grid">
+    {% for location in featured_locations %}
+      <a class="story-card" href="{% url 'location_detail' location.pk %}">
+        <div class="story-card-media">
+          {% if location.image %}
+            <img src="{{ location.image.url }}" alt="" loading="lazy">
+          {% else %}
+            <div class="route-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 280 140"><path d="M8 75h24l7-25 11 49 12-70 12 83 12-61 12 37 13-17 15 5h29c20 0 22-24 44-24 20 0 24 31 43 31 14 0 20-12 30-12"/><circle cx="272" cy="71" r="5"/></svg>
+            </div>
+          {% endif %}
+          <span class="story-card-city">{{ location.city }}</span>
+        </div>
+        <div class="story-card-body">
+          <h3>{{ location.title }}</h3>
+          <p>{{ location.short_description }}</p>
+          <span class="story-card-action">Послушать историю <span aria-hidden="true">→</span></span>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section id="how-it-works" class="how-it-works section-shell" aria-labelledby="how-title">
+  <div class="section-heading-row">
+    <div>
+      <p class="eyebrow">Как это работает</p>
+      <h2 id="how-title">Три шага — и вы в пути</h2>
+    </div>
+  </div>
+  <ol class="steps-list">
+    <li>
+      <span>01</span>
+      <h3>Задайте контекст</h3>
+      <p>Где вы, сколько времени есть и что хочется открыть сегодня.</p>
+    </li>
+    <li>
+      <span>02</span>
+      <h3>Получите прогулку</h3>
+      <p>Понятный маршрут соединит места в одну последовательную историю.</p>
+    </li>
+    <li>
+      <span>03</span>
+      <h3>Уберите телефон</h3>
+      <p>Слушайте подсказки и истории, пока город раскрывается вокруг.</p>
+    </li>
+  </ol>
+</section>
+
+<section class="closing-cta section-shell">
+  <div>
+    <p class="eyebrow">Готовы услышать город?</p>
+    <h2>Обычная прогулка может стать историей.</h2>
+  </div>
+  <a class="btn btn-light btn-large" href="#main-content">Начать прогулку <span aria-hidden="true">↑</span></a>
 </section>
 {% endblock %}

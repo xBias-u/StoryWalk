@@ -41,8 +41,8 @@ class AudioListenEventAdmin(admin.ModelAdmin):
 
 @admin.register(SubscriptionPlan)
 class SubscriptionPlanAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price_rub', 'is_demo')
-    list_filter = ('is_demo',)
+    list_display = ('name', 'price_rub', 'is_active')
+    list_filter = ('is_active',)
 
 
 @admin.register(UserProfile)

@@ -1,9 +1,10 @@
 from django.core.management.base import BaseCommand
+
 from guides.models import Location, SubscriptionPlan
 
 
 class Command(BaseCommand):
-    help = 'Seed demo data for StoryWalk MVP'
+    help = 'Seed initial StoryWalk content'
 
     def handle(self, *args, **options):
         locations = [
@@ -28,20 +29,19 @@ class Command(BaseCommand):
         for row in locations:
             Location.objects.update_or_create(title=row['title'], defaults=row)
 
-        # Keep demo pricing clean and deterministic
-        SubscriptionPlan.objects.filter(is_demo=True).delete()
+        SubscriptionPlan.objects.filter(is_active=True).delete()
 
         plans = [
-            ('Базовый', 0, 'Бесплатный доступ к базовым аудиогидам и ознакомительным маршрутам.'),
-            ('Путешественник+', 399, 'Расширенная библиотека аудиогидов и новые маршруты.'),
-            ('StoryWalk Premium', 799, 'Полный доступ к расширенным гидам и ранним релизам.'),
+            ('Базовый', 0, 'Бесплатный доступ к открытым историям и ознакомительным прогулкам.'),
+            ('Путешественник+', 399, 'Расширенная коллекция прогулок и новые маршруты.'),
+            ('StoryWalk Premium', 799, 'Полный доступ к прогулкам и ранним релизам.'),
         ]
-        for name, price, desc in plans:
+        for name, price, description in plans:
             SubscriptionPlan.objects.create(
                 name=name,
                 price_rub=price,
-                description=desc,
-                is_demo=True,
+                description=description,
+                is_active=True,
             )
 
-        self.stdout.write(self.style.SUCCESS('Demo data seeded.'))
+        self.stdout.write(self.style.SUCCESS('Initial content seeded.'))

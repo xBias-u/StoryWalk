@@ -2,32 +2,59 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StoryWalk</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f0e8">
+  <meta name="description" content="StoryWalk — персональные аудиопрогулки, которые помогают услышать город.">
+  <title>{% block title %}StoryWalk — город говорит{% endblock %}</title>
   <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
-<body>
-  <header class="topbar">
-    <a class="brand" href="/">StoryWalk</a>
-    <nav>
-      <a href="/guides/">Гиды</a>
-      <a href="/subscription-demo/">Тарифы (демо)</a>
-      <a href="{% url 'metrics' %}">Метрики продукта</a>
-      {% if user.is_authenticated %}
-        <a href="{% url 'profile' %}">Профиль</a>
-        <span class="muted">{{ user.username }}</span>
-        <form method="post" action="{% url 'logout' %}" style="display:inline;">{% csrf_token %}<button class="link-btn" type="submit">Выйти</button></form>
-      {% else %}
-        <a href="{% url 'login' %}">Войти</a>
-        <a class="btn btn-sm" href="{% url 'signup' %}">Регистрация</a>
-      {% endif %}
-    </nav>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#main-content">Перейти к содержанию</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{% url 'home' %}" aria-label="StoryWalk — на главную">
+        <svg class="brand-mark" viewBox="0 0 48 24" aria-hidden="true">
+          <path d="M2 12h3l2-6 4 12 4-16 4 20 4-14 4 8h4c4 0 3-7 8-7 3 0 4 2 4 4s-2 4-5 4h-3"/>
+          <circle cx="35" cy="17" r="1.8"/>
+        </svg>
+        <span>StoryWalk</span>
+      </a>
+
+      <nav class="primary-nav" aria-label="Основная навигация">
+        <a href="{% url 'location_list' %}">Прогулки</a>
+        <a href="{% url 'home' %}#how-it-works">Как это работает</a>
+      </nav>
+
+      <div class="account-nav">
+        {% if user.is_authenticated %}
+          <a class="account-link" href="{% url 'profile' %}">{{ user.username }}</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="text-button" type="submit">Выйти</button>
+          </form>
+        {% else %}
+          <a class="account-link" href="{% url 'login' %}">Войти</a>
+          <a class="btn btn-small" href="{% url 'signup' %}">Сохранить прогулки</a>
+        {% endif %}
+      </div>
+    </div>
   </header>
 
-  <main class="container">
+  <main id="main-content" class="site-main">
     {% block content %}{% endblock %}
   </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <a class="brand brand-footer" href="{% url 'home' %}">StoryWalk</a>
+        <p>Поднимите взгляд. Город расскажет остальное.</p>
+      </div>
+      <p class="footer-mission">Make cities speak.</p>
+    </div>
+  </footer>
 </body>
 </html>

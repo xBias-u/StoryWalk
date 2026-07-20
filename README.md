@@ -1,12 +1,12 @@
 # StoryWalk
 
-MVP веб-сервиса с аудиогидами по достопримечательностям.
+Веб-сервис персональных аудиопрогулок, который помогает меньше смотреть в экран и больше замечать город вокруг.
 
 ## Что реализовано
 - Django-проект с авторизацией и регистрацией
 - Список локаций, детальная страница и избранное
 - Встроенный кастомный HTML5-аудиоплеер
-- Демо-раздел тарифов (фримиум-логика)
+- Страница вариантов доступа
 - Метрики MVP по прослушиваниям (`/metrics`)
 - Админка для управления контентом и событиями
 
@@ -17,7 +17,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser
-python manage.py seed_demo
+python manage.py seed_content
 python manage.py runserver
 ```
 

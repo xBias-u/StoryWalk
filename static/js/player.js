@@ -55,6 +55,9 @@
 
     playBtn.addEventListener('click', () => {
       if (audio.paused) {
+        document.querySelectorAll('[data-audio]').forEach((otherAudio) => {
+          if (otherAudio !== audio) otherAudio.pause();
+        });
         audio.play();
       } else {
         audio.pause();
@@ -62,12 +65,16 @@
     });
 
     audio.addEventListener('play', () => {
-      playBtn.textContent = '⏸ Pause';
+      playBtn.textContent = 'Ⅱ';
+      playBtn.setAttribute('aria-label', 'Поставить на паузу');
+      root.classList.add('is-playing');
       if (locationId) sendEvent(currentPayload('start'));
     });
 
     audio.addEventListener('pause', () => {
-      playBtn.textContent = '▶ Play';
+      playBtn.textContent = '▶';
+      playBtn.setAttribute('aria-label', 'Продолжить воспроизведение');
+      root.classList.remove('is-playing');
     });
 
     audio.addEventListener('loadedmetadata', () => {
@@ -88,6 +95,9 @@
     });
 
     audio.addEventListener('ended', () => {
+      playBtn.textContent = '▶';
+      playBtn.setAttribute('aria-label', 'Воспроизвести снова');
+      root.classList.remove('is-playing');
       if (locationId) sendEvent(currentPayload('complete'));
     });
 

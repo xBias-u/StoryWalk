@@ -16,6 +16,11 @@ from .models import Location, SubscriptionPlan, FavoriteLocation, UserProfile, A
 class HomeView(TemplateView):
     template_name = 'guides/home.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['featured_locations'] = Location.objects.filter(is_featured=True)[:3]
+        return context
+
 
 class SignUpView(CreateView):
     form_class = SignUpForm
@@ -29,7 +34,7 @@ class SignUpView(CreateView):
         return response
 
 
-class LocationListView(LoginRequiredMixin, ListView):
+class LocationListView(ListView):
     model = Location
     template_name = 'guides/location_list.html'
     context_object_name = 'locations'
@@ -49,19 +54,36 @@ class LocationListView(LoginRequiredMixin, ListView):
         ctx = super().get_context_data(**kwargs)
         ctx['q'] = self.request.GET.get('q', '').strip()
         ctx['city'] = self.request.GET.get('city', '').strip()
-        fav_ids = set(FavoriteLocation.objects.filter(user=self.request.user).values_list('location_id', flat=True))
+        ctx['duration'] = self.request.GET.get('duration', '').strip()
+        ctx['interest'] = self.request.GET.get('interest', '').strip()
+        ctx['interest_label'] = {
+            'architecture': 'Архитектура',
+            'history': 'История',
+            'art': 'Искусство',
+            'local': 'Городские истории',
+        }.get(ctx['interest'], '')
+        fav_ids = set()
+        if self.request.user.is_authenticated:
+            fav_ids = set(
+                FavoriteLocation.objects.filter(user=self.request.user).values_list('location_id', flat=True)
+            )
         ctx['favorite_ids'] = fav_ids
         return ctx
 
 
-class LocationDetailView(LoginRequiredMixin, DetailView):
+class LocationDetailView(DetailView):
     model = Location
     template_name = 'guides/location_detail.html'
     context_object_name = 'location'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['is_favorite'] = FavoriteLocation.objects.filter(user=self.request.user, location=self.object).exists()
+        ctx['is_favorite'] = False
+        if self.request.user.is_authenticated:
+            ctx['is_favorite'] = FavoriteLocation.objects.filter(
+                user=self.request.user,
+                location=self.object,
+            ).exists()
         return ctx
 
 
@@ -90,8 +112,8 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         return ctx
 
 
-class SubscriptionDemoView(LoginRequiredMixin, TemplateView):
-    template_name = 'guides/subscription_demo.html'
+class PlansView(LoginRequiredMixin, TemplateView):
+    template_name = 'guides/plans.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

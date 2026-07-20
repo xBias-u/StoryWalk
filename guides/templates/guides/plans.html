@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Доступ — StoryWalk{% endblock %}
+{% block content %}
+<header class="page-heading page-heading-narrow">
+  <p class="eyebrow">Доступ к прогулкам</p>
+  <h1>Исследуйте город в своём темпе</h1>
+  <p>Выберите подходящий формат. Перед оплатой всегда можно познакомиться с открытыми историями.</p>
+</header>
+
+<div class="plan-grid">
+  {% for plan in plans %}
+    <article class="plan-card{% if not plan.price_rub %} plan-card-featured{% endif %}">
+      <p class="plan-name">{{ plan.name }}</p>
+      <p class="plan-price"><strong>{{ plan.price_rub }} ₽</strong><span>/ месяц</span></p>
+      <p>{{ plan.description }}</p>
+      <button class="btn btn-full" disabled>Скоро</button>
+    </article>
+  {% empty %}
+    <article class="empty-state">
+      <p class="eyebrow">На старте</p>
+      <h2>Все прогулки открыты</h2>
+      <p>Сейчас можно свободно слушать истории и помогать нам делать прогулки лучше.</p>
+      <a class="btn" href="{% url 'location_list' %}">Выбрать прогулку</a>
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}

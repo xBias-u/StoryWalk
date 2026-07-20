@@ -109,7 +109,7 @@ class SubscriptionPlan(models.Model):
     name = models.CharField('Название тарифа', max_length=120)
     price_rub = models.PositiveIntegerField('Цена в месяц (₽)', default=0)
     description = models.TextField('Описание', blank=True)
-    is_demo = models.BooleanField('Демо-тариф', default=True)
+    is_active = models.BooleanField('Доступен', default=True)
 
     def __str__(self):
         return self.name
