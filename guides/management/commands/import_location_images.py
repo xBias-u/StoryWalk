@@ -12,7 +12,7 @@ DEFAULT_MAP = {
     'istoricheskiy_muzey': 'Исторический музей',
     'kreml': 'Красная площадь',
     'kungur': 'Кунгур',
-    'ermitazh': 'Эритаж',
+    'ermitazh': 'Эрмитаж',
 }
 
 

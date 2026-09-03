@@ -14,6 +14,13 @@
     if (parts.length === 2) return parts.pop().split(';').shift();
   }
 
+  function createSessionId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+      return window.crypto.randomUUID();
+    }
+    return `sw_${Date.now()}_${Math.random().toString(36).slice(2, 14)}`;
+  }
+
   async function sendEvent(payload) {
     try {
       await fetch('/api/audio-events/', {
@@ -37,8 +44,11 @@
     const time = root.querySelector('[data-time]');
     const duration = root.querySelector('[data-duration]');
     const locationId = Number(root.dataset.locationId || 0);
+    const audioVariant = root.dataset.audioVariant || 'legacy';
 
     let lastProgressSentAt = 0;
+    let hasStarted = false;
+    let sessionId = createSessionId();
 
     function currentPayload(eventType) {
       const dur = Number(audio.duration || 0);
@@ -47,6 +57,8 @@
       return {
         location_id: locationId,
         event_type: eventType,
+        session_id: sessionId,
+        audio_variant: audioVariant,
         current_seconds: cur,
         duration_seconds: dur,
         completion_percent: completion,
@@ -68,7 +80,10 @@
       playBtn.textContent = 'Ⅱ';
       playBtn.setAttribute('aria-label', 'Поставить на паузу');
       root.classList.add('is-playing');
-      if (locationId) sendEvent(currentPayload('start'));
+      if (locationId && !hasStarted) {
+        hasStarted = true;
+        sendEvent(currentPayload('start'));
+      }
     });
 
     audio.addEventListener('pause', () => {
@@ -99,6 +114,9 @@
       playBtn.setAttribute('aria-label', 'Воспроизвести снова');
       root.classList.remove('is-playing');
       if (locationId) sendEvent(currentPayload('complete'));
+      hasStarted = false;
+      sessionId = createSessionId();
+      lastProgressSentAt = 0;
     });
 
     progress.addEventListener('input', () => {

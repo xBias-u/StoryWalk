@@ -48,15 +48,15 @@
         <p class="eyebrow">Остановитесь и посмотрите вокруг</p>
         <h2 id="listen-title">Слушайте город</h2>
       </div>
-      {% if location.audio_guide %}
+      {% if location.audio_guide.has_audio %}
         <p>Язык: {{ location.audio_guide.language }}{% if location.audio_guide.voice_name %} · голос {{ location.audio_guide.voice_name }}{% endif %}</p>
       {% endif %}
     </div>
 
-    {% if location.audio_guide %}
+    {% if location.audio_guide.has_audio %}
       <div class="players-stack">
         {% if location.audio_guide.audio_short_file %}
-          <div class="player" data-player data-location-id="{{ location.id }}">
+          <div class="player" data-player data-location-id="{{ location.id }}" data-audio-variant="short">
             <audio data-audio preload="metadata">
               <source src="{{ location.audio_guide.audio_short_file.url }}" type="audio/mpeg">
             </audio>
@@ -84,7 +84,7 @@
         {% endif %}
 
         {% if location.audio_guide.audio_long_file %}
-          <div class="player player-secondary" data-player data-location-id="{{ location.id }}">
+          <div class="player player-secondary" data-player data-location-id="{{ location.id }}" data-audio-variant="long">
             <audio data-audio preload="metadata">
               <source src="{{ location.audio_guide.audio_long_file.url }}" type="audio/mpeg">
             </audio>
@@ -111,8 +111,8 @@
           </div>
         {% endif %}
 
-        {% if not location.audio_guide.audio_short_file and not location.audio_guide.audio_long_file %}
-          <div class="player" data-player data-location-id="{{ location.id }}">
+        {% if not location.audio_guide.audio_short_file and not location.audio_guide.audio_long_file and location.audio_guide.audio_file %}
+          <div class="player" data-player data-location-id="{{ location.id }}" data-audio-variant="legacy">
             <audio data-audio preload="metadata">
               <source src="{{ location.audio_guide.audio_file.url }}" type="audio/mpeg">
             </audio>

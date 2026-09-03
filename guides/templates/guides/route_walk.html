@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if current_stop %}{{ current_stop.location.title }}{% else %}{{ route.title }}{% endif %} — StoryWalk{% endblock %}
+{% block body_class %}walk-mode{% endblock %}
+{% block content %}
+{% if not route.is_published %}
+  <div class="section-shell"><p class="route-adjustment">Редакторский предпросмотр · маршрут не опубликован</p></div>
+{% endif %}
+<div class="walk-shell">
+  <header class="walk-header">
+    <a class="walk-exit" href="{% url 'route_preview' route.slug %}" aria-label="Выйти из режима прогулки">×</a>
+    <div class="walk-route-name"><span>{{ route.district }}</span><strong>{{ route.title }}</strong></div>
+    <span class="walk-step-count">{{ current_number }}/{{ route_stops|length }}</span>
+  </header>
+
+  <div class="walk-progress" aria-label="Пройдено {{ progress_percent }} процентов">
+    <span style="width: {{ progress_percent }}%"></span>
+  </div>
+
+  {% if current_stop %}
+    <article class="walk-stop">
+      <div class="walk-stop-cover">
+        {% if current_stop.location.image %}
+          <img src="{{ current_stop.location.image.url }}" alt="{{ current_stop.location.title }}">
+        {% else %}
+          <div class="route-placeholder route-placeholder-large" aria-hidden="true">
+            <svg viewBox="0 0 560 340"><path d="M8 178h42l13-61 20 122 21-172 22 207 21-153 23 92 24-43 27 14h54c41 0 47-58 91-58 43 0 49 75 90 75 30 0 43-29 64-29"/><circle cx="540" cy="172" r="8"/></svg>
+          </div>
+        {% endif %}
+        <span class="walk-stop-marker">Остановка {{ current_number|stringformat:"02d" }}</span>
+      </div>
+
+      <div class="walk-stop-content">
+        <p class="eyebrow">{{ current_stop.location.city }} · Вы на месте</p>
+        <h1>{{ current_stop.location.title }}</h1>
+
+        {% if current_stop.observation_prompt %}
+          <aside class="look-around">
+            <span aria-hidden="true">⌁</span>
+            <div><strong>Сначала посмотрите вокруг</strong><p>{{ current_stop.observation_prompt }}</p></div>
+          </aside>
+        {% endif %}
+
+        {% if current_stop.location.audio_guide.has_audio %}
+          <div class="walk-player player" data-player data-location-id="{{ current_stop.location.id }}" data-audio-variant="route">
+            <audio data-audio preload="metadata">
+              {% if current_stop.location.audio_guide.audio_short_file %}
+                <source src="{{ current_stop.location.audio_guide.audio_short_file.url }}" type="audio/mpeg">
+              {% elif current_stop.location.audio_guide.audio_long_file %}
+                <source src="{{ current_stop.location.audio_guide.audio_long_file.url }}" type="audio/mpeg">
+              {% elif current_stop.location.audio_guide.audio_file %}
+                <source src="{{ current_stop.location.audio_guide.audio_file.url }}" type="audio/mpeg">
+              {% endif %}
+            </audio>
+            <div class="player-topline">
+              <div><span class="player-kicker">История этой остановки</span><strong>Нажмите и уберите телефон</strong></div>
+              <label class="rate-control">Скорость
+                <select data-rate aria-label="Скорость воспроизведения">
+                  <option value="1">1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
+                </select>
+              </label>
+            </div>
+            <div class="player-controls">
+              <button class="play-button" type="button" data-play aria-label="Воспроизвести историю">▶</button>
+              <div class="player-timeline">
+                <input type="range" min="0" max="100" value="0" data-progress aria-label="Прогресс истории">
+                <div class="player-meta"><span data-time>00:00</span><span data-duration>00:00</span></div>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="walk-story-fallback">
+            <p>{{ current_stop.location.short_description }}</p>
+            <a href="{% url 'location_detail' current_stop.location.pk %}">Прочитать историю →</a>
+          </div>
+        {% endif %}
+
+        <a class="walk-full-story" href="{% url 'location_detail' current_stop.location.pk %}">Подробнее об этом месте</a>
+      </div>
+    </article>
+
+    <nav class="walk-navigation" aria-label="Навигация по маршруту">
+      {% if previous_stop %}
+        <a class="walk-previous" href="{% url 'route_walk' route.slug %}?stop={{ current_number|add:'-1' }}">← Назад</a>
+      {% else %}
+        <span></span>
+      {% endif %}
+
+      {% if next_stop %}
+        <div class="next-stop-copy">
+          <span>Дальше · {{ next_stop.walk_minutes }} мин пешком</span>
+          <strong>{{ next_stop.location.title }}</strong>
+          {% if next_stop.navigation_hint %}<p>{{ next_stop.navigation_hint }}</p>{% endif %}
+        </div>
+        <a class="walk-next" href="{% url 'route_walk' route.slug %}?stop={{ current_number|add:'1' }}" aria-label="Перейти к следующей остановке">→</a>
+      {% else %}
+        <div class="next-stop-copy"><span>Маршрут завершён</span><strong>Город рассказал эту историю</strong></div>
+        <a class="walk-next" href="{% url 'location_list' %}" aria-label="Выбрать следующую прогулку">✓</a>
+      {% endif %}
+    </nav>
+  {% else %}
+    <div class="empty-state"><h1>Маршрут пока пуст</h1><a class="btn" href="{% url 'location_list' %}">Выбрать истории</a></div>
+  {% endif %}
+</div>
+
+<script src="{% static 'js/player.js' %}"></script>
+{% endblock %}

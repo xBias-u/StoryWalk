@@ -15,6 +15,7 @@ class Command(BaseCommand):
                 'full_description': 'Красная площадь — главная площадь Москвы, где расположены Кремль, ГУМ и собор Василия Блаженного.',
                 'segment': 'mixed',
                 'access_level': 'free',
+                'is_published': False,
             },
             {
                 'title': 'Корпус ВШЭ на Мясницкой',
@@ -24,12 +25,11 @@ class Command(BaseCommand):
                 'is_featured': True,
                 'segment': 'solo',
                 'access_level': 'paid',
+                'is_published': False,
             },
         ]
         for row in locations:
             Location.objects.update_or_create(title=row['title'], defaults=row)
-
-        SubscriptionPlan.objects.filter(is_active=True).delete()
 
         plans = [
             ('Базовый', 0, 'Бесплатный доступ к открытым историям и ознакомительным прогулкам.'),
@@ -37,11 +37,13 @@ class Command(BaseCommand):
             ('StoryWalk Premium', 799, 'Полный доступ к прогулкам и ранним релизам.'),
         ]
         for name, price, description in plans:
-            SubscriptionPlan.objects.create(
+            SubscriptionPlan.objects.update_or_create(
                 name=name,
-                price_rub=price,
-                description=description,
-                is_active=True,
+                defaults={
+                    'price_rub': price,
+                    'description': description,
+                    'is_active': True,
+                },
             )
 
         self.stdout.write(self.style.SUCCESS('Initial content seeded.'))

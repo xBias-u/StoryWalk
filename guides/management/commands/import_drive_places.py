@@ -48,7 +48,7 @@ class Command(BaseCommand):
                         dup.delete()
                 is_created = False
             else:
-                obj = Location.objects.create(title=row['title'], **defaults)
+                obj = Location.objects.create(title=row['title'], is_published=False, **defaults)
                 is_created = True
 
             created += int(is_created)

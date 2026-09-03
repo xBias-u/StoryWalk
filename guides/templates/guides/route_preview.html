@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}{{ route.title }} — StoryWalk{% endblock %}
+{% block content %}
+<article class="route-preview-page">
+  <header class="route-preview-hero section-shell">
+    <a class="back-link route-back-link" href="{% url 'home' %}">← Изменить выбор</a>
+    <div class="route-preview-grid">
+      <div class="route-preview-copy">
+        {% if not route.is_published %}
+          <p class="route-adjustment">Редакторский предпросмотр · маршрут не виден пользователям</p>
+        {% endif %}
+        <p class="eyebrow">Персональная прогулка · {{ route.district }}</p>
+        <h1>{{ route.title }}</h1>
+        <p class="route-summary">{{ route.summary }}</p>
+
+        <dl class="route-stats">
+          <div><dt>Время</dt><dd>{{ route.duration_minutes }} мин</dd></div>
+          <div><dt>Расстояние</dt><dd>{{ route.distance_km }} км</dd></div>
+          <div><dt>Остановки</dt><dd>{{ route_stops|length }}</dd></div>
+          <div><dt>Тема</dt><dd>{{ route.get_interest_display }}</dd></div>
+        </dl>
+
+        {% if duration_adjusted %}
+          <p class="route-adjustment">Ближайшая готовая прогулка занимает {{ route.duration_minutes }} минут вместо выбранных {{ requested_duration }}.</p>
+        {% endif %}
+        {% if route.routing_status == 'estimated' %}
+          <p class="route-adjustment">Время переходов пока оценочное. Перед публикацией маршрут будет проверен по пешеходным дорогам.</p>
+        {% endif %}
+
+        <a class="btn btn-primary btn-large" href="{% url 'route_walk' route.slug %}">
+          Начать прогулку <span aria-hidden="true">→</span>
+        </a>
+      </div>
+
+      <div class="route-map-card" aria-label="Схема маршрута">
+        <div class="route-map-topline">
+          <span>{{ route.city }}</span>
+          <span>{% if route.routing_status == 'verified' %}Путь проверен · {% endif %}{{ route.distance_km }} км</span>
+        </div>
+        <div class="route-map-line" aria-hidden="true">
+          {% if route_visualization %}
+            <svg class="verified-route" viewBox="0 0 420 520" preserveAspectRatio="xMidYMid meet">
+              {% for path in route_visualization.paths %}<path class="verified-route-path" d="{{ path }}"/>{% endfor %}
+              {% for marker in route_visualization.markers %}
+                <g class="verified-route-marker" transform="translate({{ marker.x }} {{ marker.y }})">
+                  <circle r="14"/>
+                  <text text-anchor="middle" dominant-baseline="central">{{ marker.position|stringformat:"02d" }}</text>
+                </g>
+              {% endfor %}
+            </svg>
+          {% else %}
+            <svg viewBox="0 0 420 520" preserveAspectRatio="xMidYMid meet">
+              <path d="M92 18c0 72 70 65 70 137 0 61-43 72-43 126 0 66 112 46 112 121 0 52 52 57 97 98"/>
+            </svg>
+            {% for stop in route_stops %}
+              <span class="route-map-point point-{{ forloop.counter }}"><b>{{ forloop.counter|stringformat:"02d" }}</b><em>{{ stop.location.title }}</em></span>
+            {% endfor %}
+          {% endif %}
+        </div>
+        <p class="route-map-note">
+          {% if route_visualization %}Линия рассчитана по пешеходным дорогам{% else %}Маршрут откроется шаг за шагом{% endif %}
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <section class="itinerary-section section-shell" aria-labelledby="itinerary-title">
+    <div class="section-heading-row">
+      <div><p class="eyebrow">По пути</p><h2 id="itinerary-title">Остановки одной прогулки</h2></div>
+      <p class="itinerary-walk-total">{{ total_walk_minutes }} минут между остановками</p>
+    </div>
+
+    <ol class="route-timeline">
+      {% for stop in route_stops %}
+        <li class="route-stop-card">
+          <div class="route-stop-number">{{ forloop.counter|stringformat:"02d" }}</div>
+          <div class="route-stop-media">
+            {% if stop.location.image %}
+              <img src="{{ stop.location.image.url }}" alt="{{ stop.location.title }}" loading="lazy">
+            {% else %}
+              <div class="route-placeholder" aria-hidden="true">
+                <svg viewBox="0 0 280 140"><path d="M8 75h24l7-25 11 49 12-70 12 83 12-61 12 37 13-17 15 5h29c20 0 22-24 44-24 20 0 24 31 43 31 14 0 20-12 30-12"/><circle cx="272" cy="71" r="5"/></svg>
+              </div>
+            {% endif %}
+          </div>
+          <div class="route-stop-copy">
+            <div class="route-stop-meta">
+              <span>{{ stop.location.city }}</span>
+              {% if stop.location.audio_guide.has_audio %}<span>Есть аудио</span>{% else %}<span>История готовится</span>{% endif %}
+            </div>
+            <h3>{{ stop.location.title }}</h3>
+            <p>{{ stop.location.short_description }}</p>
+            {% if stop.observation_prompt %}<p class="observation-preview"><strong>Посмотрите:</strong> {{ stop.observation_prompt }}</p>{% endif %}
+          </div>
+          {% if not forloop.first %}
+            <div class="walk-connector"><span>↓</span>{{ stop.walk_minutes }} мин пешком</div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  </section>
+
+  <section class="route-start-cta section-shell">
+    <div>
+      <p class="eyebrow">Наушники готовы?</p>
+      <h2>Первую историю можно услышать прямо сейчас.</h2>
+    </div>
+    <a class="btn btn-light btn-large" href="{% url 'route_walk' route.slug %}">Начать маршрут <span aria-hidden="true">→</span></a>
+  </section>
+</article>
+{% endblock %}

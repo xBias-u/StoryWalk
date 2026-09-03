@@ -16,9 +16,19 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
-python manage.py createsuperuser
-python manage.py seed_content
+python manage.py seed_demo
 python manage.py runserver
+```
+
+`seed_demo` идемпотентна: её можно запускать повторно. Команда без сетевых
+вызовов создаёт пять готовых остановок, привязывает bundled MP3 и публикует один
+проверенный маршрут по Красной площади. Остальной импортированный контент остаётся
+скрытым до редакционной проверки.
+
+Администратора можно создать отдельно:
+
+```bash
+python manage.py createsuperuser
 ```
 
 После запуска:
@@ -49,6 +59,93 @@ CLI-вариант (без админки):
 ```bash
 python manage.py set_location_audio --title "Красная площадь" --short /path/to/kreml_short.mp3 --long /path/to/kreml_long.mp3 --voice "Florian"
 ```
+
+### Генерация озвучки через ElevenLabs
+
+1. Скопируй `.env.example` в `.env` и добавь новый API-ключ и выбранный `voice_id`.
+2. Загрузи переменные в текущую shell-сессию: `set -a; source .env; set +a`.
+3. Подготовь отдельный UTF-8 файл с финальным текстом для слуха — это должен быть сценарий, а не текст статьи.
+4. Сгенерируй сначала одну короткую версию:
+
+```bash
+python manage.py generate_location_audio \
+  --title "Красная площадь" \
+  --length short \
+  --text-file guides/data/red-square-short.txt
+```
+
+Команда сохраняет MP3 в `media/audio_guides/` и привязывает его к `AudioGuide`. Существующее аудио не перезаписывается без явного флага `--force`. Ключ ElevenLabs нельзя передавать аргументом команды или коммитить в Git.
+
+## Редакционный конвейер точки
+
+Каждая локация проходит стадии `черновик → факты проверены → сценарий готов → озвучено → опубликовано`.
+
+Перед публикацией в админке должны быть заполнены:
+
+- координаты;
+- одна ясная идея истории;
+- минимум два источника, включая по возможности официальный;
+- короткий или длинный сценарий;
+- соответствующий аудиофайл.
+
+Колонка «Готовность» в списке локаций показывает, чего именно не хватает. Тексты сценариев хранятся в `AudioGuide`, поэтому их можно проверить и исправить до повторной генерации аудио.
+
+### Поиск мест рядом
+
+Предварительный просмотр культурных POI вокруг существующей точки:
+
+```bash
+python manage.py discover_route_candidates \
+  --from-location "Исторический музей" \
+  --radius 700 \
+  --limit 15
+```
+
+Чтобы сохранить результат во внутренний редакционный inbox, добавь `--save`. Команда не создаёт и не публикует пользовательские карточки.
+
+В админке открой «Кандидаты мест». Там можно:
+
+- добавить место в шорт-лист;
+- отклонить нерелевантное;
+- создать скрытый черновик локации для дальнейшего исследования.
+
+OpenStreetMap используется только для обнаружения названия, координат и базовой категории. Его карточка не заменяет исторические источники: перед публикацией нужны минимум две отдельные проверяемые ссылки.
+
+### Сборка редакционного маршрута Красной площади
+
+После сохранения кандидатов команда создаёт три исследованных, но скрытых черновика и неопубликованный маршрут из пяти остановок:
+
+```bash
+python manage.py build_red_square_route
+```
+
+Сотрудник, вошедший в админку, может открыть URL чернового маршрута и увидеть редакторский предпросмотр. Для анонимных пользователей тот же URL возвращает `404`. Расстояния и время переходов пока имеют статус «оценено» и должны быть заменены данными пешеходного Directions API перед публикацией.
+
+Подготовить короткие сценарии новых остановок без генерации аудио:
+
+```bash
+python manage.py prepare_red_square_scripts
+```
+
+Для полностью локального MVP на macOS можно временно озвучить сохранённый сценарий системным русским голосом:
+
+```bash
+python manage.py generate_location_audio \
+  --title "Воскресенские ворота" \
+  --length short \
+  --provider apple \
+  --voice-name "Milena — local MVP"
+```
+
+Этот провайдер предназначен только для локальной демонстрации. Финальные брендовые файлы должны быть перегенерированы утверждённым голосом через ElevenLabs.
+
+Проверить все переходы по пешеходному графу Valhalla и сохранить расстояния, время и GeoJSON-линию:
+
+```bash
+python manage.py verify_route_walking krasnaya-ploshchad-sobrannaya-zanovo
+```
+
+Для локального прототипа используется публичный сервер Valhalla. В production укажи управляемый или собственный endpoint через `VALHALLA_API_URL`; публичный сервер не должен быть инфраструктурной зависимостью продукта.
 
 ## Bulk-загрузка картинок локаций
 1. Создай папку, например:
@@ -90,6 +187,8 @@ python manage.py set_cover_largest --title "Исаакиевский собор"
 - `whitenoise` (статика)
 - настройки через env (`.env.example`)
 - `Procfile`
+- health-check `/healthz/`
+- детерминированный `seed_demo`
 
 ### Переменные окружения
 - `DEBUG=False`
@@ -97,11 +196,19 @@ python manage.py set_cover_largest --title "Исаакиевский собор"
 - `ALLOWED_HOSTS=<your-domain>`
 - `CSRF_TRUSTED_ORIGINS=https://<your-domain>`
 - `DATABASE_URL=<postgres-url>`
+- `SERVE_MEDIA_FILES=True` — раздавать bundled demo-media через WhiteNoise
+- `ELEVENLABS_API_KEY=<secret-api-key>`
+- `ELEVENLABS_VOICE_ID=<selected-voice-id>`
 
 ### Команды деплоя
 Build command:
 ```bash
-pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+pip install -r requirements.txt && python manage.py collectstatic --noinput
+```
+
+Release/pre-deploy command:
+```bash
+python manage.py migrate --noinput && python manage.py seed_demo
 ```
 
 Start command:
@@ -109,4 +216,17 @@ Start command:
 gunicorn config.wsgi:application --log-file -
 ```
 
-> Для полноценного прод-режима рекомендуется PostgreSQL.
+Production должен использовать PostgreSQL. При `DEBUG=False` проект не запустится без
+`SECRET_KEY`, `ALLOWED_HOSTS` и `DATABASE_URL`.
+
+`SERVE_MEDIA_FILES=True` — осознанный режим для малонагруженного demo: он поддерживает
+byte-range для MP3. Для постоянных пользовательских загрузок нужно вынести `MEDIA_ROOT` в S3-совместимое
+объектное хранилище.
+
+### Release-check
+
+```bash
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py test
+```
