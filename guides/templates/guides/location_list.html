@@ -1,36 +1,83 @@
 {% extends 'base.html' %}
+{% block title %}Прогулки — StoryWalk{% endblock %}
 {% block content %}
-<div class="section-title">
-  <h2>Каталог аудиогидов</h2>
-</div>
+<section class="catalog-hero section-shell">
+  <a class="back-link" href="{% url 'home' %}">← На главную</a>
+  <div class="catalog-heading">
+    <div>
+      <p class="eyebrow">{% if city %}Подобрано для вас{% else %}Коллекция StoryWalk{% endif %}</p>
+      <h1>{% if city %}Прогулка по городу {{ city }}{% else %}Выберите историю рядом{% endif %}</h1>
+      <p>{% if duration or interest_label %}{% if duration %}{{ duration }} минут{% endif %}{% if duration and interest_label %} · {% endif %}{{ interest_label }}{% else %}Короткие истории о местах, мимо которых легко пройти.{% endif %}</p>
+    </div>
+    {% if city or duration or interest_label %}
+      <span class="context-badge">Маршрут собирается</span>
+    {% endif %}
+  </div>
 
-<form class="filter-row" method="get">
-  <input type="text" name="q" placeholder="Поиск по названию" value="{{ q }}">
-  <input type="text" name="city" placeholder="Город" value="{{ city }}">
-  <button class="btn" type="submit">Найти</button>
-  <a class="btn btn-secondary" href="{% url 'location_list' %}">Сбросить</a>
-</form>
+  <form class="catalog-filter" method="get">
+    <label>
+      <span>Место</span>
+      <input type="text" name="q" placeholder="Название" value="{{ q }}">
+    </label>
+    <label>
+      <span>Город</span>
+      <input type="text" name="city" placeholder="Любой город" value="{{ city }}">
+    </label>
+    {% if duration %}<input type="hidden" name="duration" value="{{ duration }}">{% endif %}
+    {% if interest %}<input type="hidden" name="interest" value="{{ interest }}">{% endif %}
+    <button class="btn btn-dark" type="submit">Найти</button>
+    {% if q or city %}<a class="filter-reset" href="{% url 'location_list' %}">Сбросить</a>{% endif %}
+  </form>
+</section>
 
-<div class="grid">
-  {% for location in locations %}
-    <article class="card">
-      {% if location.image %}<img src="{{ location.image.url }}" alt="{{ location.title }}">{% endif %}
-      <h3>{{ location.title }} {% if location.is_featured and location.title == 'Корпус ВШЭ на Мясницкой' %}<span class="badge-featured">Фича</span>{% endif %}</h3>
-      <p class="muted">{{ location.city }}</p>
-      <p>{{ location.short_description }}</p>
-      <p class="muted">{{ location.get_access_level_display }} · {{ location.get_segment_display }}</p>
-      <div class="row-actions">
-        <a class="btn btn-secondary" href="{% url 'location_detail' location.pk %}">Открыть</a>
-        <form method="post" action="{% url 'toggle_favorite' location.pk %}">
-          {% csrf_token %}
-          <button class="btn {% if location.id in favorite_ids %}btn-danger{% else %}btn-secondary{% endif %}" type="submit">
-            {% if location.id in favorite_ids %}♥ В избранном{% else %}♡ В избранное{% endif %}
-          </button>
-        </form>
+<section class="catalog-results section-shell" aria-live="polite">
+  <div class="result-count">{{ locations|length }} историй</div>
+  <div class="catalog-grid">
+    {% for location in locations %}
+      <article class="location-card">
+        <a class="location-media" href="{% url 'location_detail' location.pk %}">
+          {% if location.image %}
+            <img src="{{ location.image.url }}" alt="{{ location.title }}" loading="lazy">
+          {% else %}
+            <div class="route-placeholder" aria-hidden="true">
+              <svg viewBox="0 0 280 140"><path d="M8 75h24l7-25 11 49 12-70 12 83 12-61 12 37 13-17 15 5h29c20 0 22-24 44-24 20 0 24 31 43 31 14 0 20-12 30-12"/><circle cx="272" cy="71" r="5"/></svg>
+            </div>
+          {% endif %}
+          <span class="location-city">{{ location.city }}</span>
+        </a>
+        <div class="location-body">
+          <div class="location-title-row">
+            <h2><a href="{% url 'location_detail' location.pk %}">{{ location.title }}</a></h2>
+            {% if location.is_featured %}<span class="quiet-badge">Выбор редакции</span>{% endif %}
+          </div>
+          <p>{{ location.short_description }}</p>
+          <div class="location-meta">
+            <span>Аудиоистория</span>
+            <span>{{ location.get_access_level_display }}</span>
+          </div>
+          <div class="location-actions">
+            <a class="btn btn-dark" href="{% url 'location_detail' location.pk %}">Открыть историю</a>
+            {% if user.is_authenticated %}
+              <form method="post" action="{% url 'toggle_favorite' location.pk %}">
+                {% csrf_token %}
+                <button class="save-button{% if location.id in favorite_ids %} is-saved{% endif %}" type="submit" aria-label="{% if location.id in favorite_ids %}Убрать из сохранённых{% else %}Сохранить{% endif %}">
+                  {% if location.id in favorite_ids %}Сохранено{% else %}Сохранить{% endif %}
+                </button>
+              </form>
+            {% else %}
+              <a class="save-button" href="{% url 'login' %}?next={{ request.path }}">Сохранить</a>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">
+        <p class="eyebrow">Ничего не найдено</p>
+        <h2>Попробуйте соседний город или другое название</h2>
+        <p>Коллекция растёт постепенно — мы выбираем качество историй, а не количество точек.</p>
+        <a class="btn btn-dark" href="{% url 'location_list' %}">Показать все истории</a>
       </div>
-    </article>
-  {% empty %}
-    <p>Ничего не найдено. Попробуй изменить фильтры.</p>
-  {% endfor %}
-</div>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}

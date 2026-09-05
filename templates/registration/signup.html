@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
+{% block title %}Создать аккаунт — StoryWalk{% endblock %}
 {% block content %}
-<h2>Регистрация</h2>
-<form method="post" class="auth-form">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button class="btn" type="submit">Создать аккаунт</button>
-  <p class="muted">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
-</form>
+<section class="auth-layout section-shell">
+  <div class="auth-intro">
+    <p class="eyebrow">Своя коллекция города</p>
+    <h1>Сохраняйте то,<br>что хочется помнить.</h1>
+    <p>Аккаунт нужен только для сохранённых историй. Слушать прогулки можно и без него.</p>
+  </div>
+  <form method="post" class="auth-form">
+    {% csrf_token %}
+    <h2>Создать аккаунт</h2>
+    {{ form.as_p }}
+    <button class="btn btn-primary btn-full" type="submit">Продолжить</button>
+    <p class="auth-switch">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+  </form>
+</section>
 {% endblock %}

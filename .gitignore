@@ -2,5 +2,18 @@
 __pycache__/
 *.pyc
 db.sqlite3
-media/
 .env
+.DS_Store
+staticfiles/
+outputs/
+
+# Runtime uploads stay local. The explicitly unignored files below are the
+# deterministic audio assets required by `seed_demo`.
+media/*
+!media/audio_guides/
+media/audio_guides/*
+!media/audio_guides/red_square_gate_short.mp3
+!media/audio_guides/historical_museum_route_short.mp3
+!media/audio_guides/red_square_short.mp3
+!media/audio_guides/lenin_mausoleum_short.mp3
+!media/audio_guides/saint_basils_short.mp3

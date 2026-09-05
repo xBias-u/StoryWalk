@@ -1,118 +1,174 @@
 {% extends 'base.html' %}
 {% load static guides_extras %}
+{% block title %}{{ location.title }} — StoryWalk{% endblock %}
 {% block content %}
-<article class="detail-card">
-  <h2>{{ location.title }} {% if location.is_featured and location.title == 'Корпус ВШЭ на Мясницкой' %}<span class="badge-featured">Фича</span>{% endif %}</h2>
-  <p class="muted">{{ location.city }}</p>
-
-  <form method="post" action="{% url 'toggle_favorite' location.pk %}" style="margin-bottom: 10px;">
-    {% csrf_token %}
-    <button class="btn {% if is_favorite %}btn-danger{% else %}btn-secondary{% endif %}" type="submit">
-      {% if is_favorite %}♥ Убрать из избранного{% else %}♡ Добавить в избранное{% endif %}
-    </button>
-  </form>
-
-  <div class="row-actions" style="margin-bottom:12px;">
-    <a href="#audio" class="btn btn-sm">🎧 Слушать</a>
-    <a href="#photos" class="btn btn-sm btn-secondary">🖼 Фото</a>
-    <a href="#text" class="btn btn-sm btn-secondary">📖 Читать</a>
-  </div>
-
-  <section id="audio">
-    {% if location.audio_guide %}
-      <h3>Аудиогид</h3>
-
-      {% if location.audio_guide.audio_short_file %}
-        <p class="muted" style="margin-bottom:6px;">Короткая версия</p>
-        <div class="player" data-player data-location-id="{{ location.id }}">
-          <audio data-audio preload="none">
-            <source src="{{ location.audio_guide.audio_short_file.url }}" type="audio/mpeg">
-          </audio>
-          <div class="player-row">
-            <button class="btn" type="button" data-play>▶ Play</button>
-            <label class="muted">Скорость
-              <select data-rate>
-                <option value="1">1x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-              </select>
-            </label>
+<article class="location-page">
+  <header class="location-hero section-shell">
+    <a class="back-link" href="{% url 'location_list' %}">← Все прогулки</a>
+    <div class="location-hero-grid">
+      <div class="location-cover">
+        {% if location.image %}
+          <img src="{{ location.image.url }}" alt="{{ location.title }}">
+        {% else %}
+          <div class="route-placeholder route-placeholder-large" aria-hidden="true">
+            <svg viewBox="0 0 560 340"><path d="M8 178h42l13-61 20 122 21-172 22 207 21-153 23 92 24-43 27 14h54c41 0 47-58 91-58 43 0 49 75 90 75 30 0 43-29 64-29"/><circle cx="540" cy="172" r="8"/></svg>
           </div>
-          <input type="range" min="0" max="100" value="0" data-progress>
-          <div class="player-meta muted"><span data-time>00:00</span> / <span data-duration>00:00</span></div>
-        </div>
-      {% endif %}
+        {% endif %}
+        <span class="cover-index">Story 0{{ location.pk }}</span>
+      </div>
 
-      {% if location.audio_guide.audio_long_file %}
-        <p class="muted" style="margin:12px 0 6px;">Длинная версия</p>
-        <div class="player" data-player data-location-id="{{ location.id }}">
-          <audio data-audio preload="none">
-            <source src="{{ location.audio_guide.audio_long_file.url }}" type="audio/mpeg">
-          </audio>
-          <div class="player-row">
-            <button class="btn" type="button" data-play>▶ Play</button>
-            <label class="muted">Скорость
-              <select data-rate>
-                <option value="1">1x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-              </select>
-            </label>
+      <div class="location-intro">
+        <p class="eyebrow">{{ location.city }} · История места</p>
+        <h1>{{ location.title }}</h1>
+        <p class="location-summary">{{ location.short_description }}</p>
+        <div class="location-tags">
+          <span>{{ location.get_access_level_display }}</span>
+          <span>{{ location.get_segment_display }}</span>
+        </div>
+        <div class="intro-actions">
+          <a href="#listen" class="btn btn-primary btn-large">Слушать историю</a>
+          {% if user.is_authenticated %}
+            <form method="post" action="{% url 'toggle_favorite' location.pk %}">
+              {% csrf_token %}
+              <button class="save-button save-button-large{% if is_favorite %} is-saved{% endif %}" type="submit">
+                {% if is_favorite %}Сохранено{% else %}Сохранить{% endif %}
+              </button>
+            </form>
+          {% else %}
+            <a class="save-button save-button-large" href="{% url 'login' %}?next={{ request.path }}">Сохранить</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="listen" class="listening-section section-shell" aria-labelledby="listen-title">
+    <div class="listening-heading">
+      <div>
+        <p class="eyebrow">Остановитесь и посмотрите вокруг</p>
+        <h2 id="listen-title">Слушайте город</h2>
+      </div>
+      {% if location.audio_guide.has_audio %}
+        <p>Язык: {{ location.audio_guide.language }}{% if location.audio_guide.voice_name %} · голос {{ location.audio_guide.voice_name }}{% endif %}</p>
+      {% endif %}
+    </div>
+
+    {% if location.audio_guide.has_audio %}
+      <div class="players-stack">
+        {% if location.audio_guide.audio_short_file %}
+          <div class="player" data-player data-location-id="{{ location.id }}" data-audio-variant="short">
+            <audio data-audio preload="metadata">
+              <source src="{{ location.audio_guide.audio_short_file.url }}" type="audio/mpeg">
+            </audio>
+            <div class="player-topline">
+              <div>
+                <span class="player-kicker">Короткая история</span>
+                <strong>Начать знакомство</strong>
+              </div>
+              <label class="rate-control">Скорость
+                <select data-rate aria-label="Скорость воспроизведения короткой истории">
+                  <option value="1">1×</option>
+                  <option value="1.25">1.25×</option>
+                  <option value="1.5">1.5×</option>
+                </select>
+              </label>
+            </div>
+            <div class="player-controls">
+              <button class="play-button" type="button" data-play aria-label="Воспроизвести короткую историю"><span aria-hidden="true">▶</span></button>
+              <div class="player-timeline">
+                <input type="range" min="0" max="100" value="0" data-progress aria-label="Прогресс короткой истории">
+                <div class="player-meta"><span data-time>00:00</span><span data-duration>00:00</span></div>
+              </div>
+            </div>
           </div>
-          <input type="range" min="0" max="100" value="0" data-progress>
-          <div class="player-meta muted"><span data-time>00:00</span> / <span data-duration>00:00</span></div>
-        </div>
-      {% endif %}
+        {% endif %}
 
-      {% if not location.audio_guide.audio_short_file and not location.audio_guide.audio_long_file %}
-        <div class="player" data-player data-location-id="{{ location.id }}">
-          <audio data-audio preload="none">
-            <source src="{{ location.audio_guide.audio_file.url }}" type="audio/mpeg">
-          </audio>
-          <div class="player-row">
-            <button class="btn" type="button" data-play>▶ Play</button>
-            <label class="muted">Скорость
-              <select data-rate>
-                <option value="1">1x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-              </select>
-            </label>
+        {% if location.audio_guide.audio_long_file %}
+          <div class="player player-secondary" data-player data-location-id="{{ location.id }}" data-audio-variant="long">
+            <audio data-audio preload="metadata">
+              <source src="{{ location.audio_guide.audio_long_file.url }}" type="audio/mpeg">
+            </audio>
+            <div class="player-topline">
+              <div>
+                <span class="player-kicker">Полная история</span>
+                <strong>Узнать место глубже</strong>
+              </div>
+              <label class="rate-control">Скорость
+                <select data-rate aria-label="Скорость воспроизведения полной истории">
+                  <option value="1">1×</option>
+                  <option value="1.25">1.25×</option>
+                  <option value="1.5">1.5×</option>
+                </select>
+              </label>
+            </div>
+            <div class="player-controls">
+              <button class="play-button" type="button" data-play aria-label="Воспроизвести полную историю"><span aria-hidden="true">▶</span></button>
+              <div class="player-timeline">
+                <input type="range" min="0" max="100" value="0" data-progress aria-label="Прогресс полной истории">
+                <div class="player-meta"><span data-time>00:00</span><span data-duration>00:00</span></div>
+              </div>
+            </div>
           </div>
-          <input type="range" min="0" max="100" value="0" data-progress>
-          <div class="player-meta muted"><span data-time>00:00</span> / <span data-duration>00:00</span></div>
-        </div>
-      {% endif %}
+        {% endif %}
 
-      <p class="muted">Язык: {{ location.audio_guide.language }}{% if location.audio_guide.voice_name %}, голос: {{ location.audio_guide.voice_name }}{% endif %}</p>
+        {% if not location.audio_guide.audio_short_file and not location.audio_guide.audio_long_file and location.audio_guide.audio_file %}
+          <div class="player" data-player data-location-id="{{ location.id }}" data-audio-variant="legacy">
+            <audio data-audio preload="metadata">
+              <source src="{{ location.audio_guide.audio_file.url }}" type="audio/mpeg">
+            </audio>
+            <div class="player-topline">
+              <div><span class="player-kicker">Аудиоистория</span><strong>Услышать это место</strong></div>
+              <label class="rate-control">Скорость
+                <select data-rate aria-label="Скорость воспроизведения">
+                  <option value="1">1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option>
+                </select>
+              </label>
+            </div>
+            <div class="player-controls">
+              <button class="play-button" type="button" data-play aria-label="Воспроизвести историю"><span aria-hidden="true">▶</span></button>
+              <div class="player-timeline">
+                <input type="range" min="0" max="100" value="0" data-progress aria-label="Прогресс истории">
+                <div class="player-meta"><span data-time>00:00</span><span data-duration>00:00</span></div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
     {% else %}
-      <p class="muted">Аудиогид пока не загружен.</p>
-    {% endif %}
-  </section>
-
-  <section id="photos">
-    {% if location.image %}<img class="detail-image" src="{{ location.image.url }}" alt="{{ location.title }}">{% endif %}
-
-    {% if location.gallery_images.exists %}
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:12px 0 16px;">
-        {% for img in location.gallery_images.all %}
-          <figure style="margin:0;">
-            <img src="{{ img.image.url }}" alt="{{ location.title }} фото {{ forloop.counter }}" style="width:100%;height:140px;object-fit:cover;border-radius:10px;">
-            <figcaption class="muted" style="font-size:12px;margin-top:4px;">Фото {{ forloop.counter }}</figcaption>
-          </figure>
-        {% endfor %}
+      <div class="empty-state empty-state-dark">
+        <p class="eyebrow">История готовится</p>
+        <h3>Скоро это место заговорит</h3>
+        <p>Мы проверяем факты и работаем над повествованием, чтобы история стоила вашей остановки.</p>
       </div>
     {% endif %}
   </section>
 
-  <section id="text">
-    <details open>
-      <summary class="muted" style="cursor:pointer;margin-bottom:8px;">Описание локации</summary>
+  {% if location.image or location.gallery_images.exists %}
+    <section class="gallery-section section-shell" aria-labelledby="gallery-title">
+      <div class="section-heading-row">
+        <div><p class="eyebrow">Посмотрите внимательнее</p><h2 id="gallery-title">Детали места</h2></div>
+      </div>
+      <div class="photo-grid">
+        {% for img in location.gallery_images.all %}
+          <figure>
+            <img src="{{ img.image.url }}" alt="{{ img.caption|default:location.title }}" loading="lazy">
+            {% if img.caption %}<figcaption>{{ img.caption }}</figcaption>{% endif %}
+          </figure>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <section class="story-text-section section-shell" aria-labelledby="story-title">
+    <div class="story-text-heading">
+      <p class="eyebrow">Если хочется прочитать</p>
+      <h2 id="story-title">История места</h2>
+    </div>
+    <details class="story-details">
+      <summary>Открыть полный текст <span aria-hidden="true">↓</span></summary>
       <div class="guide-text">{{ location.full_description|clean_guide_text|format_guide_text|linebreaks }}</div>
     </details>
   </section>
-
-  <p class="muted">Уровень доступа: {{ location.get_access_level_display }} · Сегмент: {{ location.get_segment_display }}</p>
 </article>
 
 <script src="{% static 'js/player.js' %}"></script>

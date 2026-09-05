@@ -1,28 +1,43 @@
 {% extends 'base.html' %}
+{% block title %}Мои прогулки — StoryWalk{% endblock %}
 {% block content %}
-<h2>Профиль</h2>
-<form method="post" enctype="multipart/form-data" class="auth-form">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button class="btn" type="submit">Сохранить</button>
-</form>
+<section class="profile-layout section-shell">
+  <header class="page-heading">
+    <p class="eyebrow">Личное пространство</p>
+    <h1>Мои прогулки</h1>
+    <p>Места, к которым хочется вернуться.</p>
+  </header>
 
-{% if request.user.profile.avatar %}
-  <div style="margin-top: 16px;">
-    <img src="{{ request.user.profile.avatar.url }}" alt="avatar" style="max-width: 140px; border-radius: 12px; border:1px solid #334155;">
+  <div class="profile-grid">
+    <form method="post" enctype="multipart/form-data" class="auth-form profile-form">
+      {% csrf_token %}
+      <h2>О вас</h2>
+      {% if request.user.profile.avatar %}
+        <img class="profile-avatar" src="{{ request.user.profile.avatar.url }}" alt="Аватар {{ request.user.username }}">
+      {% endif %}
+      {{ form.as_p }}
+      <button class="btn btn-dark btn-full" type="submit">Сохранить</button>
+    </form>
+
+    <section class="saved-section" aria-labelledby="saved-title">
+      <div class="section-heading-row">
+        <div><p class="eyebrow">Коллекция</p><h2 id="saved-title">Сохранённые истории</h2></div>
+      </div>
+      <div class="saved-list">
+        {% for location in favorites %}
+          <a class="saved-item" href="{% url 'location_detail' location.pk %}">
+            <span><strong>{{ location.title }}</strong><small>{{ location.city }}</small></span>
+            <span aria-hidden="true">→</span>
+          </a>
+        {% empty %}
+          <div class="empty-state">
+            <h3>Здесь пока тихо</h3>
+            <p>Сохраняйте истории, чтобы вернуться к ним во время следующей прогулки.</p>
+            <a class="btn btn-dark" href="{% url 'location_list' %}">Найти историю</a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
   </div>
-{% endif %}
-
-<h3 style="margin-top: 24px;">Избранные места</h3>
-<div class="grid">
-  {% for location in favorites %}
-    <article class="card">
-      <h4>{{ location.title }}</h4>
-      <p class="muted">{{ location.city }}</p>
-      <a class="btn btn-secondary" href="{% url 'location_detail' location.pk %}">Открыть</a>
-    </article>
-  {% empty %}
-    <p class="muted">Пока пусто — добавь что-нибудь в избранное.</p>
-  {% endfor %}
-</div>
+</section>
 {% endblock %}

@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
+{% block title %}Войти — StoryWalk{% endblock %}
 {% block content %}
-<h2>Вход</h2>
-<form method="post" class="auth-form">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button class="btn" type="submit">Войти</button>
-  <p class="muted">Нет аккаунта? <a href="{% url 'signup' %}">Зарегистрироваться</a></p>
-</form>
+<section class="auth-layout section-shell">
+  <div class="auth-intro">
+    <p class="eyebrow">Продолжите прогулку</p>
+    <h1>Ваши истории<br>всегда рядом.</h1>
+    <p>Войдите, чтобы сохранять места и возвращаться к ним в следующей прогулке.</p>
+  </div>
+  <form method="post" class="auth-form">
+    {% csrf_token %}
+    <h2>Вход</h2>
+    {{ form.as_p }}
+    <button class="btn btn-primary btn-full" type="submit">Войти</button>
+    <p class="auth-switch">Впервые здесь? <a href="{% url 'signup' %}">Создать аккаунт</a></p>
+  </form>
+</section>
 {% endblock %}

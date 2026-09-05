@@ -11,7 +11,7 @@ ALIASES = {
     'isaakievskiy_sobor': 'Исаакиевский собор',
     'istoricheskiy_muzey': 'Исторический музей',
     'kungur': 'Кунгур',
-    'ermitazh': 'Эритаж',
+    'ermitazh': 'Эрмитаж',
 }
 
 
